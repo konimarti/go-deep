@@ -21,19 +21,20 @@ func NewStatsPrinter() *StatsPrinter {
 
 // Init initializes printer
 func (p *StatsPrinter) Init(n *deep.Neural) {
-	fmt.Fprintf(p.w, "Epochs\tElapsed\tLoss (%s)\t", n.Config.Loss)
+	fmt.Fprintf(p.w, "Epochs\tElapsed\tTLoss (%s)\tVLoss (%s)\t", n.Config.Loss, n.Config.Loss)
 	if n.Config.Mode == deep.ModeMultiClass {
 		fmt.Fprintf(p.w, "Accuracy\t\n---\t---\t---\t---\t\n")
 	} else {
-		fmt.Fprintf(p.w, "\n---\t---\t---\t\n")
+		fmt.Fprintf(p.w, "\n---\t---\t---\t---\t\n")
 	}
 }
 
 // PrintProgress prints the current state of training
-func (p *StatsPrinter) PrintProgress(n *deep.Neural, validation Examples, elapsed time.Duration, iteration int) {
-	fmt.Fprintf(p.w, "%d\t%s\t%.4f\t%s\n",
+func (p *StatsPrinter) PrintProgress(n *deep.Neural, train, validation Examples, elapsed time.Duration, iteration int) {
+	fmt.Fprintf(p.w, "%d\t%s\t%.4f\t%.4f\t%s\n",
 		iteration,
 		elapsed.String(),
+		crossValidate(n, train),
 		crossValidate(n, validation),
 		formatAccuracy(n, validation))
 	p.w.Flush()
